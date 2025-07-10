@@ -1,0 +1,25 @@
+## Problems Identified:
+1. **No error handling** - request hangs if database fails
+2. **Inefficient sorting** - fetches all posts then sorts in memory instead of using database
+
+## Corrected Code:
+
+```javascript
+// postsController.js
+async function getSortedPosts(req, res) {
+  try {
+    const posts = await Posts.find().sort({ created: -1 });
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+}
+
+// router.js
+router.get('/posts', getSortedPosts);
+```
+
+## Why Each Fix Matters:
+1. **Try-catch block** - Prevents hanging requests and provides user feedback when things go wrong
+2. **Database sorting** - Much faster and uses less memory, especially with large datasets. MongoDB handles sorting efficiently
+3. **Removed async/await wrapper** - Cleaner code since we're directly passing the controller function
